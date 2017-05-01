@@ -68,6 +68,13 @@ class Branch(github.GithubObject.NonCompletableGithubObject):
         return self._enforcement_level.value
 
     @property
+    def protection(self):
+        """
+        :type: :class:`github.BranchProtection`
+        """
+        return self._branch_protection.value
+
+    @property
     def contexts(self):
         """
         :type: list of strings
@@ -87,3 +94,21 @@ class Branch(github.GithubObject.NonCompletableGithubObject):
             self._protected = self._makeBoolAttribute(attributes["protection"]["enabled"])
             self._enforcement_level = self._makeStringAttribute(attributes["protection"]["required_status_checks"]["enforcement_level"])
             self._contexts = self._makeListOfStringsAttribute(attributes["protection"]["required_status_checks"]["contexts"])
+
+            headers, data = self._requester.requestJsonAndCheck(
+                "GET",
+                attributes["protection_url"],
+                headers={'Accept': 'application/vnd.github.loki-preview+json'}
+            )
+            self._branch_protection = self._makeClassAttribute(BranchProtection, data)
+
+
+class BranchProtection(github.GithubObject.NonCompletableGithubObject):
+    def _initAttributes(self):
+        self._required_status_checks = github.GithubObject.NotSet
+        self._required_pull_request_reviews = github.GithubObject.NotSet
+        self._enforce_admins = github.GithubObject.NotSet
+        self._restrictions = github.GithubObject.NotSet
+
+    def _useAttributes(self, attributes):
+        pass

@@ -1126,6 +1126,19 @@ class Repository(github.GithubObject.CompletableGithubObject):
         )
         return github.Branch.Branch(self._requester, headers, data, completed=True)
 
+    def get_protected_branches(self):
+        """
+        :calls: `GET /repos/:owner/:repo/branches/:branch <https://developer.github.com/v3/repos/branches/#parameters>`_
+        :rtype: :class:`github.PaginatedList.PaginatedList` of :class:`github.Branch.Branch`
+        """
+        return github.PaginatedList.PaginatedList(
+            github.Branch.Branch,
+            self._requester,
+            self.url + "/branches",
+            { 'protected': 'true' },
+            {'Accept': 'application/vnd.github.loki-preview+json'}
+        )
+
     def get_branches(self):
         """
         :calls: `GET /repos/:owner/:repo/branches <http://developer.github.com/v3/repos>`_
